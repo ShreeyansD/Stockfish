@@ -1218,9 +1218,13 @@ moves_loop:  // When in check, search starts here
                             + (*contHist[1])[movedPiece][move.to_sq()]
                             + sharedHistory.pawn_entry(pos)[movedPiece][move.to_sq()];
 
-                // Continuation history based pruning
+                // Continuation history based pruning. Later quiets are likely
+                // no better, so skip them too.
                 if (history < -4136 * depth)
+                {
+                    mp.skip_quiet_moves();
                     continue;
+                }
 
                 history += 69 * mainHistory[us][move.raw()] / 32;
 
