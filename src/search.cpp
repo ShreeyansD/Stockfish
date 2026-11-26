@@ -1584,8 +1584,8 @@ moves_loop:  // When in check, search starts here
     // we update the stats of searched moves.
     else if (bestMove)
     {
-        update_all_stats(pos, ss, *this, bestMove, prevSq, quietsSearched, capturesSearched, depth,
-                         ttData.move);
+        update_all_stats(pos, ss, *this, bestMove, prevSq, quietsSearched, capturesSearched,
+                         depth + (!ss->inCheck && ss->staticEval <= bestValue), ttData.move);
         if (!PvNode)
             ttMoveHistory << (bestMove == ttData.move ? 918 : -747);
     }
