@@ -726,11 +726,11 @@ void Search::Worker::clear() {
 // Main search function for both PV and non-PV nodes
 template<NodeType nodeType>
 Value Search::Worker::search(
-  Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, const bool cutNode) {
+  Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
     constexpr bool PvNode   = nodeType != NonPV;
     constexpr bool rootNode = nodeType == Root;
-    const bool     allNode  = !(PvNode || cutNode);
+    bool           allNode  = !(PvNode || cutNode);
 
     // Dive into quiescence search when the depth reaches zero
     if (depth <= 0)
@@ -1316,6 +1316,14 @@ moves_loop:  // When in check, search starts here
             // if we are on a cutNode
             else if (ttData.value >= beta || cutNode)
                 extension = -3;
+
+            // A negative extension means we expect a cutoff here, so treat
+            // the rest of the node as a cut node
+            if (extension < 0 && !PvNode)
+            {
+                cutNode = true;
+                allNode = false;
+            }
         }
 
         u64 nodeCount = rootNode ? u64(nodes) : 0;
