@@ -1183,8 +1183,15 @@ moves_loop:  // When in check, search starts here
         // Depth conditions are important for mate finding.
         if (!rootNode && pos.non_pawn_material(us) && !is_loss(bestValue))
         {
-            // Skip quiet moves if movecount exceeds our threshold
-            if (moveCount >= (3 + depth * depth) / (2 - improving))
+            // Skip quiet moves if movecount exceeds our threshold,
+            // which grows with the history score of a quiet move
+            int lmpHistory = 0;
+            if (!capture && !givesCheck)
+                lmpHistory = (*contHist[0])[movedPiece][move.to_sq()]
+                           + (*contHist[1])[movedPiece][move.to_sq()]
+                           + sharedHistory.pawn_entry(pos)[movedPiece][move.to_sq()];
+
+            if (moveCount >= std::max((3 + depth * depth + lmpHistory / 4096) / (2 - improving), 2))
                 mp.skip_quiet_moves();
 
             // Reduced depth of the next LMR search
