@@ -1332,6 +1332,8 @@ moves_loop:  // When in check, search starts here
         if (ss->ttPv)
             r -= 3023 + PvNode * 1004 + (ttData.value > alpha) * 885
                + (ttData.depth >= depth) * (816 + cutNode * 940);
+    else if (is_valid(ttData.value) && ttData.depth >= depth)
+        r -= 512;
 
         // Base reduction offset to compensate for other tweaks
         r += 697;
